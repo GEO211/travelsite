@@ -1,0 +1,91 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-afZbwoO8iC8k3VXQEhzvB2RvMIsfNQ.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.register-form {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 1rem;
+}
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+.input-group {
+    margin-bottom: 1rem;
+}
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: bold;
+}
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.register-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.register-button:hover {
+    background-color: #45a049;
+}
+.login {
+    text-align: center;
+    margin-top: 1rem;
+    color: #555;
+    font-size: 0.9rem;
+}
+.login a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+.login a:hover {
+    text-decoration: underline;
+}
+.error {
+    color: #ff0000;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+@media (max-width: 480px) {
+    .register-form {
+        padding: 1.5rem;
+    }
+    h2 {
+        font-size: 1.75rem;
+    }
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swiss Registration Form</title>
+    <link rel="stylesheet" href="assets/css/register.css">
+</head>
+<body>
+    <div class="container">
+        <form class="register-form" id="registerForm">
+            <h2>Register</h2>
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+                <div class="error" id="nameError"></div>
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="emailError"></div>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <div class="error" id="passwordError"></div>
+            </div>
+            <div class="input-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+                <div class="error" id="confirmPasswordError"></div>
+            </div>
+            <button type="submit" class="register-button">Register</button>
+            <p class="login">
+                Already have an account? <a href="login.html">Login</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+        apiKey: "AIzaSyC7uVtT5hVCIaAW_bJCneGXVXbLxFXc040",
+        authDomain: "travelsite-bac6f.firebaseapp.com",
+        projectId: "travelsite-bac6f",
+        storageBucket: "travelsite-bac6f.firebasestorage.app",
+        messagingSenderId: "117830187443",
+        appId: "1:117830187443:web:40cfae0ca76866aaf873c6",
+        measurementId: "G-YZRT52WSB2"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            document.getElementById('confirmPasswordError').textContent = '';
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            let isValid = true;
+
+            if (name.length < 2) {
+                document.getElementById('nameError').textContent = 'Name must be at least 2 characters long';
+                isValid = false;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('emailError').textContent = 'Please enter a valid email address';
+                isValid = false;
+            }
+
+            if (password.length < 8) {
+                document.getElementById('passwordError').textContent = 'Password must be at least 8 characters long';
+                isValid = false;
+            } else if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+                document.getElementById('passwordError').textContent = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+                isValid = false;
+            }
+
+            if (isValid) {
+                const registerButton = document.querySelector('.register-button');
+                registerButton.disabled = true;
+                registerButton.textContent = 'Registering...';
+
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        return db.collection('users').doc(user.uid).set({
+                            name: name,
+                            email: email
+                        });
+                    })
+                    .then(() => {
+                        alert('Registration successful! Welcome to our platform, ' + name + '!');
+                        window.location.href = 'login.html';
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('Registration failed: ' + error.message);
+                    })
+                    .finally(() => {
+                        registerButton.disabled = false;
+                        registerButton.textContent = 'Register';
+                    });
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            const strengthText = ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+            const strengthColor = ['#ff0000', '#ff8c00', '#ffd700', '#9acd32', '#32cd32'];
+            document.getElementById('passwordError').textContent = 'Password strength: ' + strengthText[strength - 1];
+            document.getElementById('passwordError').style.color = strengthColor[strength - 1];
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const name = document.getElementById('name').value;
+
+    // Check if this is the admin email
+    const isAdmin = email === 'admin@email.com'; // Change this to your desired admin email
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            return db.collection('users').doc(user.uid).set({
+                name: name,
+                email: email,
+                isAdmin: isAdmin, // This will be true for admin email
+                created_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        })
+        .then(() => {
+            alert('Registration successful!');
+            window.location.href = 'login.html';
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Registration failed: ' + error.message);
+        });
+});
+    </script>
+</body>
+</html>
