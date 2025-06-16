@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check authentication and load data
     auth.onAuthStateChanged((user) => {
+        const isGuest = sessionStorage.getItem('isGuest') === 'true';
         if (user) {
             db.collection('users').doc(user.uid).get()
                 .then((doc) => {
@@ -33,8 +34,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.location.href = 'index.html';
                     }
                 });
+        } else if (isGuest) {
+            // Allow guest access
+            document.getElementById('adminEmail').textContent = 'Guest User';
+            loadInquiries();
+            setupEventListeners();
         } else {
-            window.location.href = 'login.html';
+            window.location.href = 'admin-login.html';
         }
     });
 });

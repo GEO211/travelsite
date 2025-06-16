@@ -704,57 +704,73 @@
 
     // Authentication State Observer
     auth.onAuthStateChanged((user) => {
-        if (!user) {
+        const isGuest = sessionStorage.getItem('isGuest') === 'true';
+        if (!user && !isGuest) {
             window.location.href = 'login.html';
+        }
+        
+        // Update UI based on authentication status
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            if (isGuest) {
+                logoutButton.textContent = 'Login';
+                logoutButton.addEventListener('click', () => {
+                    sessionStorage.removeItem('isGuest');
+                    window.location.href = 'login.html';
+                });
+            } else {
+                logoutButton.textContent = 'Log Out';
+                logoutButton.addEventListener('click', () => {
+                    auth.signOut()
+                        .then(() => {
+                            window.location.href = 'login.html';
+                        })
+                        .catch((error) => {
+                            console.error('Error signing out:', error);
+                        });
+                });
+            }
         }
     });
 
-    // Logout Functionality
-    const logoutButton = document.getElementById('logoutButton');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            auth.signOut()
-                .then(() => {
-                    window.location.href = 'login.html';
-                })
-                .catch((error) => {
-                    console.error('Error signing out:', error);
-                });
-        });
-    }
-
     // Tour Search Form Submission
-// Tour Search Form Submission
-document.querySelector('.tour-search-form')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (!auth.currentUser) {
-        alert('Please login first');
-        window.location.href = 'login.html';
-        return;
-    }
-    
-    const formData = {
-        destination: document.getElementById('destination').value,
-        people: document.getElementById('people').value,
-        checkin_date: document.getElementById('checkin').value,
-        checkout_date: document.getElementById('checkout').value,
-        email: auth.currentUser.email,
-        userId: auth.currentUser.uid,  // Add user ID
-        status: 'pending',
-        created_at: firebase.firestore.Timestamp.now()
-    };
+    document.querySelector('.tour-search-form')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const isGuest = sessionStorage.getItem('isGuest') === 'true';
+        if (!auth.currentUser && !isGuest) {
+            alert('Please login first');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        if (isGuest) {
+            alert('Please login to submit an inquiry');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        const formData = {
+            destination: document.getElementById('destination').value,
+            people: document.getElementById('people').value,
+            checkin_date: document.getElementById('checkin').value,
+            checkout_date: document.getElementById('checkout').value,
+            email: auth.currentUser.email,
+            userId: auth.currentUser.uid,  // Add user ID
+            status: 'pending',
+            created_at: firebase.firestore.Timestamp.now()
+        };
 
-    db.collection('inquiries').add(formData)
-        .then(() => {
-            alert('Inquiry submitted successfully!');
-            this.reset();
-        })
-        .catch(error => {
-            console.error('Error submitting inquiry:', error);
-            alert('Error submitting inquiry. Please try again.');
-        });
-});
+        db.collection('inquiries').add(formData)
+            .then(() => {
+                alert('Inquiry submitted successfully!');
+                this.reset();
+            })
+            .catch(error => {
+                console.error('Error submitting inquiry:', error);
+                alert('Error submitting inquiry. Please try again.');
+            });
+    });
 </script>
 </body>
 </html>

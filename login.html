@@ -31,6 +31,10 @@
             <p class="register">
                 Don't have an account? <a href="register.html">Register</a>
             </p>
+            <div class="guest-section">
+                <p>Or continue as</p>
+                <button type="button" class="guest-button" id="guestButton">Guest</button>
+            </div>
         </form>
     </div>
 
@@ -116,6 +120,42 @@
                     console.error('Error:', error);
                     alert('Failed to send password reset email: ' + error.message);
                 });
+        });
+    </script>
+    <style>
+        .guest-section {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .guest-section p {
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        .guest-button {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #dee2e6;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .guest-button:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+            transform: translateY(-1px);
+        }
+    </style>
+    <script>
+        document.getElementById('guestButton').addEventListener('click', function() {
+            // Store guest status in sessionStorage
+            sessionStorage.setItem('isGuest', 'true');
+            window.location.href = 'index.html';
         });
     </script>
 </body>
